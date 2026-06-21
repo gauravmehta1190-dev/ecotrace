@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoTrace - Carbon Footprint Tracker & Reduction Platform</title>
+  <meta name="description" content="Calculate, track, and systematically reduce your daily ecological carbon footprint through simple challenges and personalized insights.">
+  <link rel="stylesheet" href="src/css/main.css">
+</head>
+<body>
+
+  <!-- Keyboard Accessibility Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- APP HEADER -->
+  <header class="app-header">
+    <a href="#" class="logo-container" aria-label="EcoTrace Home">
+      <span class="logo-icon" aria-hidden="true">🌱</span>
+      <span class="logo-text">EcoTrace</span>
+    </a>
+
+    <!-- Main Landmarks Navigation -->
+    <nav class="app-nav" aria-label="Main Navigation">
+      <a href="#dashboard" class="nav-link active" data-view="dashboard" aria-current="page">
+        <span aria-hidden="true">📊</span> Dashboard
+      </a>
+      <a href="#logger" class="nav-link" data-view="logger">
+        <span aria-hidden="true">📝</span> Track Emissions
+      </a>
+      <a href="#challenges" class="nav-link" data-view="challenges">
+        <span aria-hidden="true">⚡</span> Challenges
+      </a>
+      <a href="#diagnostics" class="nav-link" data-view="diagnostics">
+        <span aria-hidden="true">🔬</span> Diagnostics
+      </a>
+    </nav>
+
+    <!-- Settings Badge & Theme Toggles -->
+    <div class="header-actions">
+      <button id="theme-toggle" class="btn-theme-toggle" aria-label="Switch to Light Theme">☀️</button>
+      <button id="profile-badge" class="btn-profile-badge" aria-label="Open User Profile Settings">
+        <span aria-hidden="true">👤</span>
+        <span id="profile-name">Eco Warrior</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ONBOARDING WIZARD OVERLAY -->
+  <div id="wizard-overlay" class="wizard-overlay" role="dialog" aria-modal="true" aria-labelledby="wizard-title">
+    <div class="glass-card wizard-card">
+      <h1 id="wizard-title" class="logo-text" style="font-size: 2.2rem; margin-bottom: 1rem;">Welcome to EcoTrace</h1>
+      <p style="margin-bottom: 2rem;">Let's establish your baseline footprint and set up personalized target limits in three simple steps.</p>
+      
+      <!-- Wizard Progress Dots -->
+      <div class="wizard-progress" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+        <div class="wizard-dot active" aria-hidden="true"></div>
+        <div class="wizard-dot" aria-hidden="true"></div>
+        <div class="wizard-dot" aria-hidden="true"></div>
+      </div>
+
+      <!-- Step 1: Username -->
+      <div class="wizard-step active" data-step="0">
+        <span class="wizard-icon" aria-hidden="true">👋</span>
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">What should we call you?</h2>
+        <div class="form-group">
+          <label for="wizard-name" class="form-label">Your Name or Alias</label>
+          <input type="text" id="wizard-name" class="form-input" placeholder="e.g. Jane Doe" value="Eco Warrior">
+        </div>
+      </div>
+
+      <!-- Step 2: Carbon Target budget -->
+      <div class="wizard-step" data-step="1">
+        <span class="wizard-icon" aria-hidden="true">🎯</span>
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Define your daily carbon budget</h2>
+        <p style="font-size: 0.85rem; margin-bottom: 1.25rem;">Standard global daily emission target is 15-20 kg CO2e. Average US daily target is ~45 kg CO2e.</p>
+        <div class="form-group">
+          <label for="wizard-target" class="form-label">Daily Limit Budget (kg CO2e)</label>
+          <input type="number" id="wizard-target" class="form-input" min="1" max="100" step="0.5" value="18">
+        </div>
+      </div>
+
+      <!-- Step 3: Country Context -->
+      <div class="wizard-step" data-step="2">
+        <span class="wizard-icon" aria-hidden="true">🌍</span>
+        <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">Select your country</h2>
+        <p style="font-size: 0.85rem; margin-bottom: 1.25rem;">This adjusts grid-mix parameters and benchmarks regional statistics.</p>
+        <div class="form-group">
+          <label for="wizard-country" class="form-label">Country/Region</label>
+          <select id="wizard-country" class="form-select">
+            <option value="US">United States / Canada</option>
+            <option value="EU">European Union / UK</option>
+            <option value="IN">India / Asia Pacific</option>
+            <option value="GL" selected>Global Average Mix</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions Buttons -->
+      <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+        <button id="wizard-prev" class="btn btn-secondary" style="display: none;">Back</button>
+        <button id="wizard-next" class="btn btn-primary" style="margin-left: auto;">Next Step</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTENTS -->
+  <main id="main-content" class="main-layout" role="main">
+
+    <!-- VIEW: DASHBOARD -->
+    <section id="dashboard-view" class="app-view active" aria-labelledby="dashboard-title">
+      <div class="dashboard-grid">
+        
+        <!-- Welcome Banner -->
+        <div class="col-12" style="margin-bottom: 0.5rem;">
+          <h1 id="dashboard-title" style="font-size: 2.2rem; margin-bottom: 0.25rem;">Environmental Dashboard</h1>
+          <p>Real-time analytics of your carbon intensity, reduction milestones, and trends.</p>
+        </div>
+
+        <!-- Metric Budget Circle -->
+        <div class="col-4 glass-card metric-summary-card">
+          <h2 class="metric-label">Daily Emission Status</h2>
+          
+          <div class="metric-circle-container">
+            <svg class="metric-circle-svg" viewBox="0 0 160 160">
+              <circle class="metric-circle-bg" cx="80" cy="80" r="70"></circle>
+              <circle class="metric-circle-fill" cx="80" cy="80" r="70"></circle>
+            </svg>
+            <div class="metric-text">
+              <span class="metric-value">0.0</span>
+              <span class="metric-unit">kg CO2e</span>
+            </div>
+          </div>
+          
+          <div class="metric-compare">
+            <span style="color: var(--text-muted);">No logs recorded today</span>
+          </div>
+        </div>
+
+        <!-- Category Grid Widget -->
+        <div class="col-8 glass-card">
+          <h2 style="font-size: 1.3rem; margin-bottom: 1.25rem;">Emissions Breakdown by Activity</h2>
+          <div class="widget-grid">
+            
+            <div class="mini-widget">
+              <div class="mini-widget-icon" aria-hidden="true">🚗</div>
+              <div class="mini-widget-details">
+                <span class="mini-widget-title">Transit/Flights</span>
+                <span class="mini-widget-val" id="val-transport">0.0 kg</span>
+              </div>
+            </div>
+
+            <div class="mini-widget">
+              <div class="mini-widget-icon" aria-hidden="true">⚡</div>
+              <div class="mini-widget-details">
+                <span class="mini-widget-title">Home Utility Energy</span>
+                <span class="mini-widget-val" id="val-energy">0.0 kg</span>
+              </div>
+            </div>
+
+            <div class="mini-widget">
+              <div class="mini-widget-icon" aria-hidden="true">🥗</div>
+              <div class="mini-widget-details">
+                <span class="mini-widget-title">Dietary Habits</span>
+                <span class="mini-widget-val" id="val-diet">0.0 kg</span>
+              </div>
+            </div>
+
+            <div class="mini-widget">
+              <div class="mini-widget-icon" aria-hidden="true">♻️</div>
+              <div class="mini-widget-details">
+                <span class="mini-widget-title">Waste & Goods</span>
+                <span class="mini-widget-val" id="val-waste">0.0 kg</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Total Milestone offset status -->
+          <div style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <div>
+              <h3 style="font-size: 1.05rem; margin-bottom: 0.15rem;">Cumulative Offsets Saved</h3>
+              <p style="font-size: 0.85rem; margin-bottom: 0; color: var(--text-muted);">Total carbon avoided through successfully logged challenges.</p>
+            </div>
+            <div style="background: hsla(150, 84%, 38%, 0.15); border: 1px solid var(--accent-emerald); border-radius: 12px; padding: 0.5rem 1.25rem; font-weight: 700; color: var(--accent-emerald-light); font-size: 1.2rem;" id="total-savings-badge">
+              0.0 kg
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Trend SVG Chart Graph -->
+        <div class="col-8 glass-card">
+          <h2 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Historical Footprint Trends</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Daily logs trend for the last 7 entries (in kg CO2e).</p>
+          <div id="trends-chart-container" class="chart-container">
+            <!-- SVG injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Adaptive Insights panel -->
+        <div class="col-4 glass-card" style="display: flex; flex-direction: column;">
+          <h2 style="font-size: 1.3rem; margin-bottom: 1.25rem;">Personalized Insights</h2>
+          <div id="insights-container" style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Injected via insights module -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW: LOGGER TRACKING -->
+    <section id="logger-view" class="app-view" aria-labelledby="logger-title">
+      <div class="dashboard-grid">
+        
+        <!-- Form Header -->
+        <div class="col-12" style="margin-bottom: 0.5rem;">
+          <h1 id="logger-title" style="font-size: 2.2rem; margin-bottom: 0.25rem;">Track Daily Footprint</h1>
+          <p>Select a date on the calendar, fill in your activities, and save. Logged dates are highlighted.</p>
+        </div>
+
+        <!-- Main Submission Form -->
+        <form id="tracker-form" class="col-8 glass-card" style="display: flex; flex-direction: column; gap: 1.75rem;">
+          
+          <!-- Selected date banner (visible, managed by calendar) -->
+          <div class="selected-date-banner" id="selected-date-banner">
+            <span class="selected-date-icon" aria-hidden="true">📅</span>
+            <div class="selected-date-info">
+              <span class="selected-date-label">Logging for</span>
+              <span class="selected-date-value" id="selected-date-display">Today</span>
+            </div>
+            <button type="button" id="btn-log-today" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-left: auto;">Today</button>
+          </div>
+
+          <!-- Category 1: Transportation -->
+          <fieldset style="border: none;">
+            <legend style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; color: var(--accent-emerald-light); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🚗</span> Travel &amp; Commute
+            </legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="carKm" class="form-label">Car Mileage Distance (km)</label>
+                <input type="number" id="carKm" name="carKm" class="form-input" min="0" max="1000" step="1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="carFuelType" class="form-label">Fuel Vehicle Type</label>
+                <select id="carFuelType" name="carFuelType" class="form-select">
+                  <option value="petrol">Petrol / Gasoline</option>
+                  <option value="diesel">Diesel</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="electric">Electric (EV)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="busKm" class="form-label">Bus Travel Distance (km)</label>
+                <input type="number" id="busKm" name="busKm" class="form-input" min="0" max="500" step="1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="trainKm" class="form-label">Train / Subway Distance (km)</label>
+                <input type="number" id="trainKm" name="trainKm" class="form-input" min="0" max="1000" step="1" placeholder="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="flightShortHours" class="form-label">Short-Haul Flights (< 3 hrs) (flight hours)</label>
+                <input type="number" id="flightShortHours" name="flightShortHours" class="form-input" min="0" max="24" step="0.5" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="flightLongHours" class="form-label">Long-Haul Flights (>= 3 hrs) (flight hours)</label>
+                <input type="number" id="flightLongHours" name="flightLongHours" class="form-input" min="0" max="24" step="0.5" placeholder="0">
+              </div>
+            </div>
+          </fieldset>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+          <!-- Category 2: Utility Energy -->
+          <fieldset style="border: none;">
+            <legend style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; color: var(--accent-emerald-light); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>⚡</span> Home Utilities &amp; Energy
+            </legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="electricityKwh" class="form-label">Electricity Usage (kWh)</label>
+                <input type="number" id="electricityKwh" name="electricityKwh" class="form-input" min="0" max="200" step="0.1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="electricityCleanPercent" class="form-label">Renewable / Clean energy mix</label>
+                <div class="slider-container">
+                  <input type="range" id="electricityCleanPercent" name="electricityCleanPercent" class="range-slider" min="0" max="100" step="5" value="0">
+                  <span class="slider-val" id="slider-val-clean">0%</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="gasKwh" class="form-label">Gas Consumption (kWh)</label>
+                <input type="number" id="gasKwh" name="gasKwh" class="form-input" min="0" max="300" step="0.1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="heatingOilKwh" class="form-label">Heating Oil (kWh)</label>
+                <input type="number" id="heatingOilKwh" name="heatingOilKwh" class="form-input" min="0" max="300" step="0.1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="waterM3" class="form-label">Water Usage (m³)</label>
+                <input type="number" id="waterM3" name="waterM3" class="form-input" min="0" max="5" step="0.05" placeholder="0">
+              </div>
+            </div>
+          </fieldset>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+          <!-- Category 3: Diet habits -->
+          <fieldset style="border: none;">
+            <legend style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; color: var(--accent-emerald-light); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🥗</span> Dietary Intakes
+            </legend>
+            <div class="form-group">
+              <label for="dietType" class="form-label">Dietary Habit Type</label>
+              <select id="dietType" name="dietType" class="form-select">
+                <option value="heavyMeat">Heavy Meat Eater (> 100g meat daily)</option>
+                <option value="mediumMeat" selected>Average Meat / Mixed Diet</option>
+                <option value="lowMeat">Low Meat Eater (< 50g meat daily)</option>
+                <option value="pescatarian">Pescatarian (Fish & Veggies)</option>
+                <option value="vegetarian">Vegetarian (Dairy & Eggs, No Meat)</option>
+                <option value="vegan">Vegan (Strict Plant-Based)</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+          <!-- Category 4: Waste & Purchases -->
+          <fieldset style="border: none;">
+            <legend style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; color: var(--accent-emerald-light); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🗑️</span> Waste & Material Consumption
+            </legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="landfillKg" class="form-label">General Landfill Trash (kg)</label>
+                <input type="number" id="landfillKg" name="landfillKg" class="form-input" min="0" max="50" step="0.1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="recycledKg" class="form-label">Recycled Materials (kg)</label>
+                <input type="number" id="recycledKg" name="recycledKg" class="form-input" min="0" max="50" step="0.1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="compostKg" class="form-label">Composted Waste (kg)</label>
+                <input type="number" id="compostKg" name="compostKg" class="form-input" min="0" max="50" step="0.1" placeholder="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="clothingCount" class="form-label">New Clothing items bought</label>
+                <input type="number" id="clothingCount" name="clothingCount" class="form-input" min="0" max="10" step="1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="electronicsCount" class="form-label">New Tech/Gadget items bought</label>
+                <input type="number" id="electronicsCount" name="electronicsCount" class="form-input" min="0" max="5" step="1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="appliancesCount" class="form-label">New Appliance items bought</label>
+                <input type="number" id="appliancesCount" name="appliancesCount" class="form-input" min="0" max="2" step="1" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="furnitureCount" class="form-label">New Furniture items bought</label>
+                <input type="number" id="furnitureCount" name="furnitureCount" class="form-input" min="0" max="5" step="1" placeholder="0">
+              </div>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 1rem; align-self: flex-start; padding: 0.8rem 2.5rem; font-size: 1.05rem;">
+            Save Log Entry
+          </button>
+        </form>
+
+        <!-- Calendar + Log History Side Panel -->
+        <div class="col-4" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          
+          <!-- Inline Calendar Widget -->
+          <div class="glass-card" style="padding: 1.25rem;">
+            <div class="calendar-header">
+              <button type="button" id="cal-prev" class="btn btn-icon btn-secondary" aria-label="Previous month">◀</button>
+              <h3 id="cal-month-label" class="calendar-month-label">June 2026</h3>
+              <button type="button" id="cal-next" class="btn btn-icon btn-secondary" aria-label="Next month">▶</button>
+            </div>
+            <div class="calendar-weekdays" aria-hidden="true">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="calendar-grid" id="cal-grid" role="grid" aria-label="Emissions log calendar">
+              <!-- Days injected by JS -->
+            </div>
+            <div class="calendar-legend">
+              <span class="legend-item"><span class="legend-dot legend-dot--logged"></span> Logged</span>
+              <span class="legend-item"><span class="legend-dot legend-dot--selected"></span> Selected</span>
+              <span class="legend-item"><span class="legend-dot legend-dot--today"></span> Today</span>
+            </div>
+          </div>
+
+          <!-- Log History List -->
+          <div class="glass-card" style="display: flex; flex-direction: column; flex: 1; max-height: 380px;">
+            <h2 style="font-size: 1.15rem; margin-bottom: 0.75rem;">Recent Log Entries</h2>
+            <div id="history-list" class="history-list" style="flex: 1;">
+              <!-- Dynamically populated from JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW: REDUCTION CHALLENGES -->
+    <section id="challenges-view" class="app-view" aria-labelledby="challenges-title">
+      <div class="dashboard-grid">
+        <div class="col-12" style="margin-bottom: 0.5rem;">
+          <h1 id="challenges-title" style="font-size: 2.2rem; margin-bottom: 0.25rem;">Footprint Mitigation Challenges</h1>
+          <p>Subscribe to habit pledges to systematically offset your carbon emissions and monitor your streaks.</p>
+        </div>
+      </div>
+      <div class="challenges-grid" id="challenges-grid" style="margin-top: 1rem;">
+        <!-- Challenge Cards rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW: DIAGNOSTICS & SYSTEM TESTS -->
+    <section id="diagnostics-view" class="app-view" aria-labelledby="diagnostics-title">
+      <div class="dashboard-grid">
+        <div class="col-12" style="margin-bottom: 0.5rem;">
+          <h1 id="diagnostics-title" style="font-size: 2.2rem; margin-bottom: 0.25rem;">System Diagnostics</h1>
+          <p>Verify calculation integrity, run browser unit test assertions, and manage storage dumps.</p>
+        </div>
+
+        <div class="col-4 glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h2 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Quality Controls</h2>
+            <p style="font-size: 0.85rem;">Run the complete unit assertion suite on carbon equations, local storage transactions, and offsets calculation directly inside the browser environment.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <button id="btn-run-tests" class="btn btn-primary" style="width: 100%;">
+              Run Test Suite Assertions
+            </button>
+            <button id="btn-reset-data" class="btn btn-danger" style="width: 100%;">
+              Wipe Database Details
+            </button>
+          </div>
+        </div>
+
+        <div class="col-8 glass-card test-suite-panel">
+          <div class="test-stats-row">
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; text-align: center;">
+              <span class="mini-widget-title" style="font-size: 0.75rem;">Passed Checks</span>
+              <div id="test-passed-count" style="font-size: 2rem; font-weight: 800; color: var(--accent-emerald-light); margin-top: 0.25rem;">0</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; text-align: center;">
+              <span class="mini-widget-title" style="font-size: 0.75rem;">Failed Checks</span>
+              <div id="test-failed-count" style="font-size: 2rem; font-weight: 800; color: var(--accent-red); margin-top: 0.25rem;">0</div>
+            </div>
+          </div>
+          <div id="test-log-console" class="test-log-console" aria-live="polite" aria-label="Diagnostics test runner log panel">
+            Press "Run Test Suite Assertions" to launch tests...
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- OVERLAY MODAL: PROFILE SETTINGS -->
+  <div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="settings-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="settings-title" style="margin-bottom: 0;">Update Settings</h2>
+        <button id="btn-close-settings" class="modal-close" aria-label="Close dialog modal">&times;</button>
+      </div>
+      <form id="settings-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="settings-name" class="form-label">User Profile Name</label>
+            <input type="text" id="settings-name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label for="settings-target" class="form-label">Daily Emissions Target (kg CO2e)</label>
+            <input type="number" id="settings-target" class="form-input" min="1" max="100" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="settings-country" class="form-label">Country Context</label>
+            <select id="settings-country" class="form-select">
+              <option value="US">United States / Canada</option>
+              <option value="EU">European Union / UK</option>
+              <option value="IN">India / Asia Pacific</option>
+              <option value="GL">Global Average Mix</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('settings-modal').classList.remove('active')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP FOOTER -->
+  <footer class="app-footer" role="contentinfo">
+    <p>EcoTrace Carbon Footprint Awareness Platform &copy; 2026. Made with environmental stewardship in mind.</p>
+  </footer>
+
+  <!-- Application Entry script -->
+  <script type="module" src="src/js/app.js"></script>
+</body>
+</html>

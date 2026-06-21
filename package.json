@@ -1,0 +1,18 @@
+{
+  "name": "carbon-footprint-awareness-platform",
+  "version": "1.0.0",
+  "description": "A functional application allowing individuals to track, calculate, and systematically reduce their daily environmental footprint.",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/calculator.test.js"
+  },
+  "keywords": [
+    "carbon",
+    "footprint",
+    "tracker",
+    "sustainability",
+    "calculator"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}
